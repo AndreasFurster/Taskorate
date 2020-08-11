@@ -1,0 +1,55 @@
+﻿@page "/"
+@using QuickTask.BlazorApp.Services
+@using System.Collections.ObjectModel
+@using System.Collections.Specialized
+@using Microsoft.AspNetCore.SignalR.Client
+@using QuickTask.Models
+@inject QuickTaskService QuickTaskService
+
+<h1>Task list</h1>
+
+<label>
+    Task list:
+    <input @bind="TaskListName" />
+</label>
+<br/>
+<label>
+    Add task:
+    <input @bind="TaskName" />
+</label>
+
+<button class="btn btn-primary" @onclick="AddTask">Add</button>
+
+<h2>Tasks</h2>
+@for(var i = 0; i < QuickTaskService.Tasks.Count; i++)
+{
+    // Introduce local variable because @bind uses closures.
+    var index = i;
+
+    <li><input type="checkbox" @bind="QuickTaskService.Tasks[index].Done"/> <input @bind="QuickTaskService.Tasks[index].Name"/></li>
+}
+
+
+@code {
+    private string TaskListName { get; set; }
+    private string TaskName { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        QuickTaskService.OnCollectionChanged += (sender, args) =>
+        {
+            StateHasChanged();
+        };
+
+        await QuickTaskService.InitializeHubConnection();
+        await QuickTaskService.LoadAll();
+    }
+
+    private async Task AddTask()
+    {
+        if (string.IsNullOrWhiteSpace(TaskName)) return;
+
+        await QuickTaskService.Add(new QuickTaskModel(TaskName));
+        TaskName = null;
+    }
+}
