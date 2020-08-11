@@ -22,7 +22,7 @@ namespace Taskorate.BlazorApp
             builder.RootComponents.Add<App>("app");
 
             // TODO: Env variables?
-            var apiUrl = builder.HostEnvironment.IsDevelopment() ? "http://localhost:7071/api/" : "https://quick-task.azurewebsites.net/api/";
+            var apiUrl = builder.HostEnvironment.IsDevelopment() ? "http://localhost:7071/api/" : "https://taskorate.azurewebsites.net/api/";
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiUrl) });
             builder.Services.AddScoped(sp => new HubConnectionBuilder().WithUrl(apiUrl).Build());
