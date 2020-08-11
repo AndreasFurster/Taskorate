@@ -18,7 +18,7 @@ namespace Taskorate.Functions.Functions
         [FunctionName("status")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req,
-            [CosmosDB("TaskorateDb", "tasks", ConnectionStringSetting = "CosmosDBConnectionString")] DocumentClient documentClient,
+            [CosmosDB("TaskorateDb", "tasks", ConnectionStringSetting = "CosmosDB")] DocumentClient documentClient,
             ILogger log)
         {
             var result = new StatusResult();

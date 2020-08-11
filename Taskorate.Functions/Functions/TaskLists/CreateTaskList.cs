@@ -27,7 +27,7 @@ namespace Taskorate.Functions.Functions.TaskLists
         [FunctionName(nameof(CreateTaskList))]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "task-lists")] HttpRequest req,
-            [CosmosDB("TaskorateDb", "tasks")] DocumentClient documentClient,
+            [CosmosDB("TaskorateDb", "tasks", ConnectionStringSetting = "CosmosDB")] DocumentClient documentClient,
             ILogger log)
         {
             // Parse body

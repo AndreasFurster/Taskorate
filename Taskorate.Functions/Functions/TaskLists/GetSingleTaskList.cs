@@ -17,7 +17,7 @@ namespace Taskorate.Functions.Functions.TaskLists.Tasks
         [FunctionName(nameof(GetSingleTaskList))]
         public static IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "task-lists/{id:guid}")] HttpRequest req,
-            [CosmosDB("TaskorateDb","tasks", Id = "{id}", PartitionKey = "{id}")] QuickTaskList taskList,
+            [CosmosDB("TaskorateDb","tasks", Id = "{id}", PartitionKey = "{id}", ConnectionStringSetting = "CosmosDB")] QuickTaskList taskList,
             ILogger log)
         {
             if(taskList == null) return new NotFoundResult();

@@ -28,7 +28,7 @@ namespace Taskorate.Functions.Functions.TaskLists.Tasks
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "task-lists/{taskListId:guid}/tasks")] HttpRequest req,
             Guid taskListId,
-            [CosmosDB("TaskorateDb","tasks")] DocumentClient documentClient,
+            [CosmosDB("TaskorateDb","tasks", ConnectionStringSetting = "CosmosDB")] DocumentClient documentClient,
             [SignalR(HubName = "tasks")] IAsyncCollector<SignalRMessage> signalRMessages,
             ILogger log)
         {

@@ -17,7 +17,7 @@ namespace Taskorate.Functions.Functions.TaskLists.Tasks
         [FunctionName(nameof(GetAllTaskLists))]
         public static IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Admin, "get", Route = "task-lists")] HttpRequest req,
-            [CosmosDB("TaskorateDb","tasks")]
+            [CosmosDB("TaskorateDb","tasks", ConnectionStringSetting = "CosmosDB")]
             IEnumerable<QuickTaskList> taskLists,
             ILogger log)
         {
