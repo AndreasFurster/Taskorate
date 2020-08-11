@@ -1,0 +1,80 @@
+﻿@page "/{id:guid}"
+@using Taskorate.BlazorApp.Services
+@using Taskorate.Models
+@using Microsoft.Extensions.Logging
+@inject QuickTaskService QuickTaskService
+@inject ILogger<QuickTaskService> Logger
+
+
+<h1>Task list</h1>
+
+<br />
+<label>
+    Add task:
+    <input @bind="TaskName" />
+</label>
+
+<button class="btn btn-primary" @onclick="AddTask">Add</button>
+
+<h2>Tasks</h2>
+@for (var i = 0; i < QuickTaskService.Tasks.Count; i++)
+{
+    // Introduce local variable because @bind uses closures.
+    var index = i;
+
+    <li>
+        <input type="checkbox" checked="@QuickTaskService.Tasks[index].Done" @onchange="@(e => UpdateChecked(index, e))" />
+        <input type="text" value="@QuickTaskService.Tasks[index].Name" @oninput="@(e => UpdateName(index, e))" />
+    </li>
+}
+
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private string TaskName { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation(nameof(OnInitializedAsync));
+        QuickTaskService.OnCollectionChanged += (sender, args) =>
+        {
+            StateHasChanged();
+        };
+
+        QuickTaskService.ClearTasks();
+        QuickTaskService.SetTaskListId(Id);
+
+        await QuickTaskService.InitializeHubConnection();
+        await QuickTaskService.LoadTasks();
+    }
+
+    private async Task AddTask()
+    {
+        if (string.IsNullOrWhiteSpace(TaskName)) return;
+
+        await QuickTaskService.Add(new QuickTask(TaskName));
+
+        TaskName = null;
+    }
+
+    private async Task UpdateChecked(int index, ChangeEventArgs arg)
+    {
+        var value = (bool)arg.Value;
+        var task = QuickTaskService.Tasks[index];
+        task.Done = value;
+
+        await QuickTaskService.Update(task);
+    }
+
+    private async Task UpdateName(int index, ChangeEventArgs arg)
+    {
+        var value = arg.Value.ToString();
+        var task = QuickTaskService.Tasks[index];
+        task.Name = value;
+
+        await QuickTaskService.Update(task);
+    }
+
+}

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickTask.Functions", "QuickTask.Functions\QuickTask.Functions.csproj", "{13FCF8E5-B6C4-445E-B3C4-9BAF47A48736}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taskorate.Functions", "Taskorate.Functions\Taskorate.Functions.csproj", "{13FCF8E5-B6C4-445E-B3C4-9BAF47A48736}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickTask.BlazorApp", "QuickTask.BlazorApp\QuickTask.BlazorApp.csproj", "{670D5D0D-0662-4510-96D0-4AEBD13C220A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taskorate.BlazorApp", "Taskorate.BlazorApp\Taskorate.BlazorApp.csproj", "{670D5D0D-0662-4510-96D0-4AEBD13C220A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickTask.Models", "QuickTask.Models\QuickTask.Models.csproj", "{6EE940B1-800E-409E-85B3-C0D36BDF9437}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taskorate.Models", "Taskorate.Models\Taskorate.Models.csproj", "{6EE940B1-800E-409E-85B3-C0D36BDF9437}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

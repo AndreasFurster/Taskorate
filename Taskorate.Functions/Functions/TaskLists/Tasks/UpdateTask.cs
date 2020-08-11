@@ -39,7 +39,7 @@ namespace Taskorate.Functions.Functions.TaskLists.Tasks
             // Send new task to everyone
             await signalRMessages.AddAsync(new SignalRMessage
             {
-                Target = "updateTask",
+                Target = $"{taskListId}/updatedTask",
                 Arguments = new object[] { task }
             });
 

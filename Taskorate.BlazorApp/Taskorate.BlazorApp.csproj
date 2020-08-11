@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QuickTask.Models\QuickTask.Models.csproj" />
+    <ProjectReference Include="..\Taskorate.Models\Taskorate.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>

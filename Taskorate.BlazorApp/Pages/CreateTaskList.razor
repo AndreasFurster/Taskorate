@@ -1,0 +1,35 @@
+﻿@page "/"
+@using Taskorate.BlazorApp.Services
+@using Taskorate.Models
+@using Microsoft.Extensions.Logging
+@inject TaskListService TaskListService
+@inject NavigationManager NavigationManager
+
+<h1>Create a new task list</h1>
+
+<br />
+<label>
+    Name:
+    <input @bind="TaskListName" />
+</label>
+
+<button class="btn btn-primary" @onclick="AddTaskList">Add</button>
+
+@code {
+
+    private string TaskListName { get; set; }
+
+    //protected override async Task OnInitializedAsync()
+    //{
+
+    //}
+
+    private async Task AddTaskList()
+    {
+        if (string.IsNullOrWhiteSpace(TaskListName)) return;
+
+        var result = await TaskListService.Add(new QuickTaskList(TaskListName));
+
+        NavigationManager.NavigateTo($"/{result.Id}");
+    }
+}

@@ -16,7 +16,7 @@ namespace Taskorate.Functions.Functions.TaskLists.Tasks
         // https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-cosmosdb-v2-input?tabs=csharp
         [FunctionName(nameof(GetAllTaskLists))]
         public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "task-lists")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Admin, "get", Route = "task-lists")] HttpRequest req,
             [CosmosDB("TaskorateDb","tasks")]
             IEnumerable<QuickTaskList> taskLists,
             ILogger log)
