@@ -14,7 +14,7 @@ namespace Taskorate.Functions.Functions
         [FunctionName("negotiate")]
         public static IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
-            [SignalRConnectionInfo(HubName = "tasks")] SignalRConnectionInfo connectionInfo)
+            [SignalRConnectionInfo(HubName = "tasks", ConnectionStringSetting = "AzureSignalRConnectionString")] SignalRConnectionInfo connectionInfo)
         {
             return new OkObjectResult(connectionInfo);
         }

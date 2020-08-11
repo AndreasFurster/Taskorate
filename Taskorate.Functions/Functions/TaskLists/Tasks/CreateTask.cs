@@ -28,7 +28,7 @@ namespace Taskorate.Functions.Functions.TaskLists.Tasks
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "task-lists/{taskListId:guid}/tasks")] HttpRequest req,
             Guid taskListId,
             [CosmosDB("TaskorateDb","tasks", ConnectionStringSetting = "CosmosDB")] DocumentClient documentClient,
-            [SignalR(HubName = "tasks")] IAsyncCollector<SignalRMessage> signalRMessages,
+            [SignalR(HubName = "tasks", ConnectionStringSetting = "AzureSignalRConnectionString")] IAsyncCollector<SignalRMessage> signalRMessages,
             ILogger log)
         {
             // Parse body
