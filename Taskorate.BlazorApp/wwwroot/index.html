@@ -4,24 +4,27 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Taskorate.BlazorApp</title>
+    <title>Taskorate</title>
     <base href="/" />
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/app.css" rel="stylesheet" />
     <link href="manifest.json" rel="manifest" />
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+    <link rel="stylesheet" href="/dist/app.css">
 </head>
 
-<body>
-    <app>Loading...</app>
+<body class="bg-gray-300">
+    <app><span class="w-full block text-center text-3xl text-purple-600 mt-20">Loading...</span></app>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
+    <div id="blazor-error-ui" class="hidden bg-red-300 px-4 py-3 fixed bottom-0 w-full border-red-800 border-solid border-t">
+      <div class="flex">
+        <span class="flex-auto text-red-800">An unhandled error has occurred.</span>
+        <!-- <a class="flex-initial text-red-800 font-semibold mr-4" href="/">Reload</a> -->
+        <a class="flex-initial text-red-800 no-underline" href="#" onclick="document.getElementById('blazor-error-ui').style.display = 'none'">🗙</a>
+      </div>
     </div>
+    
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
+    <script src="/dist/app.js"></script>
 </body>
 
 </html>

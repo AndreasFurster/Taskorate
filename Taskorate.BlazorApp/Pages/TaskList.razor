@@ -8,25 +8,32 @@
 
 <h1>Task list</h1>
 
-<br />
-<label>
-    Add task:
-    <input @bind="TaskName" />
-</label>
 
-<button class="btn btn-primary" @onclick="AddTask">Add</button>
+<div class="flex my-3">
+  <input @bind="TaskName" @onkeyup="AddTaskKeyUp" placeholder="Add task..." class="flex-auto mr-2 rounded py-3 px-6 border-2 border-purple-400 border-solid" />
+  <button class="bg-purple-700 text-white py-3 px-6 rounded" @onclick="AddTask">Add</button>
+</div>
 
-<h2>Tasks</h2>
-@for (var i = 0; i < QuickTaskService.Tasks.Count; i++)
-{
-    // Introduce local variable because @bind uses closures.
-    var index = i;
+<ul>
+  @for (var i = 0; i < QuickTaskService.Tasks.Count; i++)
+  {
+      // Introduce local variable because @bind uses closures.
+      var index = i;
 
-    <li>
-        <input type="checkbox" checked="@QuickTaskService.Tasks[index].Done" @onchange="@(e => UpdateChecked(index, e))" />
-        <input type="text" value="@QuickTaskService.Tasks[index].Name" @oninput="@(e => UpdateName(index, e))" />
-    </li>
-}
+      <li class="group list-none flex mb-2 @(index == focussedTask ? "bg-blue-600" : "")">
+        <span class="mr-2 opacity-0 group-hover:opacity-100">
+          ↕
+        </span>
+        <span class="mr-2">
+          <Checkbox Value="@QuickTaskService.Tasks[index].Done" @onchange="@(e => UpdateChecked(index, e))" />
+        </span>
+        <input class="flex-auto mr-2 py-3 px-6 rounded-none outline-none focus:outline-none bg-transparent border-solid border-b-2 border-gray-400 hover:border-gray-500 focus:rounded focus:bg-white focus:border-2 focus:border-purple-400" type="text" value="@QuickTaskService.Tasks[index].Name" @oninput="@(e => UpdateName(index, e))" />
+        <button class="flex-initial" tabindex="-1" @onclick="@(e => DeleteTask(index, e))">
+          <svg class="text-gray-500 w-6 h-6" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path d="M459.232,60.687h-71.955c-1.121-17.642-15.631-31.657-33.553-31.657H161.669	c-17.921,0-32.441,14.015-33.553,31.657H64.579c-18.647,0-33.767,15.12-33.767,33.768v8.442c0,18.648,15.12,33.768,33.767,33.768	h21.04v342.113c0,13.784,11.179,24.963,24.963,24.963h308.996c13.784,0,24.964-11.179,24.964-24.963V136.665h14.691	c18.663,0,33.768-15.12,33.768-33.768v-8.442C493,75.807,477.896,60.687,459.232,60.687z M196.674,443.725	c0,12.58-10.197,22.803-22.802,22.803c-12.598,0-22.803-10.223-22.803-22.803v-284.9c0-12.597,10.205-22.802,22.803-22.802	c12.605,0,22.802,10.206,22.802,22.802V443.725z M287.887,443.725c0,12.58-10.205,22.803-22.803,22.803	s-22.803-10.223-22.803-22.803v-284.9c0-12.597,10.205-22.802,22.803-22.802s22.803,10.206,22.803,22.802V443.725z M379.099,443.725	c0,12.58-10.205,22.803-22.803,22.803c-12.613,0-22.803-10.223-22.803-22.803v-284.9c0-12.597,10.189-22.802,22.803-22.802	c12.598,0,22.803,10.206,22.803,22.802V443.725z"/></svg>
+        </button>
+      </li>
+  } 
+</ul>
 
 
 @code {
@@ -34,6 +41,8 @@
     public Guid Id { get; set; }
 
     private string TaskName { get; set; }
+
+    private int focussedTask = -1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,6 +57,12 @@
 
         await QuickTaskService.InitializeHubConnection();
         await QuickTaskService.LoadTasks();
+    }
+
+    private async Task AddTaskKeyUp(KeyboardEventArgs eventArgs) {
+      if(eventArgs.Key == "Enter") {
+        await AddTask();
+      }
     }
 
     private async Task AddTask()
@@ -75,6 +90,11 @@
         task.Name = value;
 
         await QuickTaskService.Update(task);
+    }
+
+    private async Task DeleteTask(int index, EventArgs args) {
+      var task = QuickTaskService.Tasks[index];
+      await QuickTaskService.Delete(task);
     }
 
 }

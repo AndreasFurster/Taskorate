@@ -7,13 +7,10 @@
 
 <h1>Create a new task list</h1>
 
-<br />
-<label>
-    Name:
-    <input @bind="TaskListName" />
-</label>
-
-<button class="btn btn-primary" @onclick="AddTaskList">Add</button>
+<div class="flex mt-3">
+  <input @bind="TaskListName" placeholder="Pick a name..." class="flex-auto mr-2 rounded py-3 px-6 border-2 border-purple-400 border-solid"/>
+  <button class="flex-initial bg-purple-700 text-white py-3 px-6 rounded" @onclick="AddTaskList">Add</button>
+</div>
 
 @code {
 

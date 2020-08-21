@@ -1,6 +1,6 @@
 {
-  "name": "Taskorate.BlazorApp",
-  "short_name": "Taskorate.BlazorApp",
+  "name": "Taskorate",
+  "short_name": "Taskorate",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",

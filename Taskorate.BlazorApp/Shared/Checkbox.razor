@@ -1,0 +1,27 @@
+<div @onclick="ToggleValue" class="cursor-pointer">
+  @if(Value) {
+    <span>✔</span>
+  } else {
+    <span>❌</span>
+  }
+</div>
+
+@code {
+  [Parameter]
+  public bool Value { get; set; }
+
+  [Parameter]
+  public EventCallback<ChangeEventArgs> OnChange { get; set; }
+
+  public async Task ToggleValue() {
+    Value = !Value;
+
+    if(OnChange.HasDelegate){
+      var args = new ChangeEventArgs{
+        Value = Value
+      };
+
+      await OnChange.InvokeAsync(args);
+    }
+  }
+}

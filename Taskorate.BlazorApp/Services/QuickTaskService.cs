@@ -79,6 +79,24 @@ namespace Taskorate.BlazorApp.Services
                 OnCollectionChanged?.Invoke(this, new EventArgs());
             });
 
+            _updatedTaskMessageListener = _hubConnection.On<Guid>($"{_taskListId}/deletedTask", id =>
+            {
+                _preventEventHandler = true;
+
+                // Find task with same id
+                var existingTask = Tasks.FirstOrDefault(t => t.Id == id);
+
+                if (existingTask != null)
+                {
+                    var index = Tasks.IndexOf(existingTask);
+                    Tasks.RemoveAt(index);
+                }
+
+                _preventEventHandler = false;
+
+                OnCollectionChanged?.Invoke(this, new EventArgs());
+            });
+
             if (_hubConnection.State == HubConnectionState.Disconnected)
             {
                 await _hubConnection.StartAsync();
@@ -156,6 +174,11 @@ namespace Taskorate.BlazorApp.Services
         public async Task Update(QuickTask task)
         {
             await _httpClient.PutAsJsonAsync($"task-lists/{_taskListId}/tasks", task);
+        }
+
+        public async Task Delete(QuickTask task)
+        {
+            await _httpClient.DeleteAsync($"task-lists/{_taskListId}/tasks/{task.Id}");
         }
 
         //public void ReplaceRange(IEnumerable<Models.QuickTask> taskList)
