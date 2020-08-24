@@ -11,12 +11,18 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: Taskorate.BlazorApp
+
     steps:
     - uses: actions/checkout@v2
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.100-preview.7.20366.6
+        
     - name: Install dependencies
       run: dotnet restore
       
