@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Taskorate.Models;
+using Taskorate.Models.Messages;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Taskorate.Functions.Functions.TaskLists.Tasks
@@ -25,42 +26,42 @@ namespace Taskorate.Functions.Functions.TaskLists.Tasks
         // https://docs.microsoft.com/en-us/aspnet/web-api/overview/web-api-routing-and-actions/attribute-routing-in-web-api-2#route-constraints
 
         [FunctionName(nameof(DeleteTask))]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "task-lists/{taskListId:guid}/tasks/{taskId:guid}")] HttpRequest req,
-            Guid taskListId,
-            Guid taskId,
-            [CosmosDB("TaskorateDb","tasks", ConnectionStringSetting = "CosmosDB")] DocumentClient documentClient,
-            [SignalR(HubName = "tasks", ConnectionStringSetting = "AzureSignalRConnectionString")] IAsyncCollector<SignalRMessage> signalRMessages,
+        public static async Task Run(
+            [SignalRTrigger(Constants.SignalRTasksHubName, "messages", DeleteTaskMessage.MethodName, ConnectionStringSetting = Constants.SignalRConnectionStringSetting)] InvocationContext invocationContext,
+            [SignalRParameter] DeleteTaskMessage argument,
+            
+            [CosmosDB(Constants.CosmosDbDatabase, Constants.CosmosDbTasksCollection, ConnectionStringSetting = Constants.CosmosDbConnectionStringSetting)] DocumentClient documentClient,
+            [SignalR(HubName = Constants.SignalRTasksHubName, ConnectionStringSetting = Constants.SignalRConnectionStringSetting)] IAsyncCollector<SignalRMessage> signalRMessages,
             ILogger log)
         {
-            // Parse body
-            // var json = await req.ReadAsStringAsync();
-            // var task = JsonSerializer.Deserialize<QuickTask>(json, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            var taskListId = argument.TaskListId;
+            var taskId = argument.QuickTaskId;
 
             // Send new task to everyone
             await signalRMessages.AddAsync(new SignalRMessage
             {
-                Target = $"{taskListId}/deletedTask",
-                Arguments = new object[] { taskId }
+              GroupName = taskListId,
+              Target = GotDeletedTaskMessage.MethodName,
+              Arguments = new object[] { new GotDeletedTaskMessage(taskId) { IgnoreConnectionId = invocationContext.ConnectionId }}
             });
 
             // Get entire task list
-            var uri = UriFactory.CreateDocumentUri("TaskorateDb", "tasks", taskListId.ToString());
+            var uri = UriFactory.CreateDocumentUri(Constants.CosmosDbDatabase, Constants.CosmosDbTasksCollection, taskListId.ToString());
             var requestOptions = new RequestOptions{ PartitionKey = new PartitionKey(taskListId.ToString()), JsonSerializerSettings = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() } };
             var taskList = await documentClient.ReadDocumentAsync<QuickTaskList>(uri, requestOptions);
             
-            // Add task to task list
-            if (taskList.Document == null) return new NotFoundResult();
-            if (taskList.Document.Tasks == null) return new BadRequestObjectResult("No tasks found for this list.");
+            // // Add task to task list
+            // TODO: handle error
+            // if (taskList.Document == null) return new NotFoundResult();
+            // if (taskList.Document.Tasks == null) return new BadRequestObjectResult("No tasks found for this list.");
 
             var index = taskList.Document.Tasks.FindIndex(t => t.Id == taskId);
-            if (index == -1) return new BadRequestObjectResult($"Task with id {taskId} not found on this list.");
+            // TODO: handle error
+            // if (index == -1) return new BadRequestObjectResult($"Task with id {taskId} not found on this list.");
 
             taskList.Document.Tasks.RemoveAt(index);
 
             await documentClient.ReplaceDocumentAsync(uri, taskList.Document, requestOptions);
-
-            return new OkResult();
         }
     }
 }

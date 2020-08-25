@@ -16,7 +16,7 @@ namespace Taskorate.Models
             
         }
 
-        public Guid? Id { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
         public List<QuickTask> Tasks { get; set; }
     }

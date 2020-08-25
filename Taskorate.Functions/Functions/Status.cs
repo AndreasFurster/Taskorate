@@ -18,7 +18,7 @@ namespace Taskorate.Functions.Functions
         [FunctionName("status")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req,
-            [CosmosDB("TaskorateDb", "tasks", ConnectionStringSetting = "CosmosDB")] DocumentClient documentClient,
+            [CosmosDB("TaskorateDb", "tasks", ConnectionStringSetting = Constants.CosmosDbConnectionStringSetting)] DocumentClient documentClient,
             ILogger log)
         {
             var result = new StatusResult();
@@ -27,12 +27,14 @@ namespace Taskorate.Functions.Functions
             //var cosmosDbConnectionString = Environment.GetEnvironmentVariable("CosmosDB");
             //result.CosmosDbConnectionStringPresent = !string.IsNullOrEmpty(cosmosDbConnectionString);
 
-            var signalRConnectionString = Environment.GetEnvironmentVariable("AzureSignalRConnectionString");
+            var signalRConnectionString = Environment.GetEnvironmentVariable(Constants.SignalRConnectionStringSetting);
             result.SignalRConnectionStringPresent = !string.IsNullOrEmpty(signalRConnectionString);
 
             var databaseUri = UriFactory.CreateDatabaseUri("TaskorateDb");
             var database = await documentClient.ReadDatabaseAsync(databaseUri);
             result.CosmosDbConnectionSuccess = database?.Resource != null;
+
+            
 
             return new OkObjectResult(result);
         }
@@ -43,6 +45,8 @@ namespace Taskorate.Functions.Functions
             public bool? CosmosDbConnectionSuccess { get; set; }
             public bool? SignalRConnectionStringPresent { get; set; }
             public bool? SignalRConnectionSuccess { get; set; }
+
+            
         }
     }
 }

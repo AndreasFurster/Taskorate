@@ -25,7 +25,7 @@ namespace Taskorate.Functions
         //    ConnectionStringSetting = "CosmosDBConnectionString",
         //    LeaseCollectionName = "leases", 
         //    CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input,
-        //    [SignalR(HubName = "tasks", ConnectionStringSetting = "Azure__SignalR__ConnectionString")] IAsyncCollector<SignalRMessage> signalRMessages, 
+        //    [SignalR(HubName = Constants.SignalRTasksHubName, ConnectionStringSetting = "Azure__SignalR__ConnectionString")] IAsyncCollector<SignalRMessage> signalRMessages, 
         //    ILogger log)
         //{
         //    if (input != null && input.Count > 0)

@@ -27,14 +27,15 @@ namespace Taskorate.Functions.Functions.TaskLists
         [FunctionName(nameof(CreateTaskList))]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "task-lists")] HttpRequest req,
-            [CosmosDB("TaskorateDb", "tasks", ConnectionStringSetting = "CosmosDB")] DocumentClient documentClient,
+            [CosmosDB("TaskorateDb", "tasks", ConnectionStringSetting = Constants.CosmosDbConnectionStringSetting)] DocumentClient documentClient,
             ILogger log)
         {
             // Parse body
             var json = await req.ReadAsStringAsync();
             var taskList = JsonSerializer.Deserialize<QuickTaskList>(json, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-            taskList.Id = Guid.NewGuid();
+            taskList.Id = IdentifierGenerator.Generate();
+            taskList.Tasks = new List<QuickTask>();
 
             var uri = UriFactory.CreateDocumentCollectionUri("TaskorateDb", "tasks");
             var requestOptions = new RequestOptions{JsonSerializerSettings = new JsonSerializerSettings{ContractResolver = new CamelCasePropertyNamesContractResolver()}};

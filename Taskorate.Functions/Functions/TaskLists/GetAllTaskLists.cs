@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -17,7 +14,7 @@ namespace Taskorate.Functions.Functions.TaskLists.Tasks
         [FunctionName(nameof(GetAllTaskLists))]
         public static IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Admin, "get", Route = "task-lists")] HttpRequest req,
-            [CosmosDB("TaskorateDb","tasks", ConnectionStringSetting = "CosmosDB")]
+            [CosmosDB(Constants.CosmosDbDatabase, Constants.CosmosDbTasksCollection, ConnectionStringSetting = Constants.CosmosDbConnectionStringSetting)]
             IEnumerable<QuickTaskList> taskLists,
             ILogger log)
         {

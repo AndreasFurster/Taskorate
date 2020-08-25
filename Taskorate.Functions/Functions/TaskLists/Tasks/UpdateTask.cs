@@ -15,51 +15,54 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Taskorate.Models;
+using Taskorate.Models.Messages;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Taskorate.Functions.Functions.TaskLists.Tasks
 {
-    class UpdateTask
+  class UpdateTask
+  {
+    // HTTP routes
+    // https://docs.microsoft.com/en-us/aspnet/web-api/overview/web-api-routing-and-actions/attribute-routing-in-web-api-2#route-constraints
+
+    [FunctionName(nameof(UpdateTask))]
+    public static async Task<IActionResult> Run(
+        [SignalRTrigger(Constants.SignalRTasksHubName, "messages", UpdateTaskMessage.MethodName, ConnectionStringSetting = Constants.SignalRConnectionStringSetting)] InvocationContext invocationContext,
+        [SignalRParameter] UpdateTaskMessage argument,
+
+        [CosmosDB(Constants.CosmosDbDatabase, Constants.CosmosDbTasksCollection, ConnectionStringSetting = Constants.CosmosDbConnectionStringSetting)] DocumentClient documentClient,
+        [SignalR(HubName = Constants.SignalRTasksHubName, ConnectionStringSetting = Constants.SignalRConnectionStringSetting)] IAsyncCollector<SignalRMessage> signalRMessages,
+        ILogger log)
     {
-        // HTTP routes
-        // https://docs.microsoft.com/en-us/aspnet/web-api/overview/web-api-routing-and-actions/attribute-routing-in-web-api-2#route-constraints
+      // Parse body
+      var taskListId = argument.TaskListId;
+      var task = argument.QuickTask;
 
-        [FunctionName(nameof(UpdateTask))]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "task-lists/{taskListId:guid}/tasks")] HttpRequest req,
-            Guid taskListId,
-            [CosmosDB("TaskorateDb","tasks", ConnectionStringSetting = "CosmosDB")] DocumentClient documentClient,
-            [SignalR(HubName = "tasks", ConnectionStringSetting = "AzureSignalRConnectionString")] IAsyncCollector<SignalRMessage> signalRMessages,
-            ILogger log)
-        {
-            // Parse body
-            var json = await req.ReadAsStringAsync();
-            var task = JsonSerializer.Deserialize<QuickTask>(json, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+      // Send new task to everyone in group
+      await signalRMessages.AddAsync(new SignalRMessage
+      {
+        GroupName = taskListId,
+        Target = GotUpdatedTaskMessage.MethodName,
+        Arguments = new object[] { new GotUpdatedTaskMessage(task) { IgnoreConnectionId = invocationContext.ConnectionId }}
+      });
 
-            // Send new task to everyone
-            await signalRMessages.AddAsync(new SignalRMessage
-            {
-                Target = $"{taskListId}/updatedTask",
-                Arguments = new object[] { task }
-            });
+      // Get entire task list
+      var uri = UriFactory.CreateDocumentUri("TaskorateDb", "tasks", taskListId.ToString());
+      var requestOptions = new RequestOptions { PartitionKey = new PartitionKey(taskListId.ToString()), JsonSerializerSettings = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() } };
+      var taskList = await documentClient.ReadDocumentAsync<QuickTaskList>(uri, requestOptions);
 
-            // Get entire task list
-            var uri = UriFactory.CreateDocumentUri("TaskorateDb", "tasks", taskListId.ToString());
-            var requestOptions = new RequestOptions{ PartitionKey = new PartitionKey(taskListId.ToString()), JsonSerializerSettings = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() } };
-            var taskList = await documentClient.ReadDocumentAsync<QuickTaskList>(uri, requestOptions);
-            
-            // Add task to task list
-            if (taskList.Document == null) return new NotFoundResult();
-            if (taskList.Document.Tasks == null) return new BadRequestObjectResult("No tasks found for this list.");
+      // Add task to task list
+      if (taskList.Document == null) return new NotFoundResult();
+      if (taskList.Document.Tasks == null) return new BadRequestObjectResult("No tasks found for this list.");
 
-            var index = taskList.Document.Tasks.FindIndex(t => t.Id == task.Id);
-            if (index == -1) return new BadRequestObjectResult($"Task with id {task.Id} not found on this list.");
+      var index = taskList.Document.Tasks.FindIndex(t => t.Id == task.Id);
+      if (index == -1) return new BadRequestObjectResult($"Task with id {task.Id} not found on this list.");
 
-            taskList.Document.Tasks[index] = task;
+      taskList.Document.Tasks[index] = task;
 
-            await documentClient.ReplaceDocumentAsync(uri, taskList.Document, requestOptions);
+      await documentClient.ReplaceDocumentAsync(uri, taskList.Document, requestOptions);
 
-            return new OkObjectResult(task);
-        }
+      return new OkObjectResult(task);
     }
+  }
 }

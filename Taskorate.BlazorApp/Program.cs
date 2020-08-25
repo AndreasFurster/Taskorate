@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Taskorate.BlazorApp.Services;
+using Microsoft.AspNetCore.Http.Connections;
 
 namespace Taskorate.BlazorApp
 {
