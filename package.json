@@ -1,0 +1,23 @@
+{
+  "name": "taskorate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently npm:start-functions npm:start-blazor-node npm:start-blazor-app",
+    "start-cosmosdb-emulator": "cd \"C:\\Program Files\\Azure Cosmos DB Emulator\" && Microsoft.Azure.Cosmos.Emulator.exe",
+    "start-storage-emulator": "cd \"%ProgramFiles(x86)%\\Microsoft SDKs\\Azure\\Storage Emulator\" && StartStorageEmulator.cmd",
+    "start-functions": "cd Taskorate.Functions && dotnet watch msbuild /t:RunFunctions",
+    "start-blazor-node": "cd Taskorate.BlazorApp\\node-frontend && npm run dev",
+    "start-blazor-app": "cd Taskorate.BlazorApp && dotnet watch start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndreasFurster/Taskorate.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/AndreasFurster/Taskorate/issues"
+  },
+  "homepage": "https://github.com/AndreasFurster/Taskorate#readme"
+}
