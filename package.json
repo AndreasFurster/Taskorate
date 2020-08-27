@@ -9,7 +9,7 @@
     "start-storage-emulator": "cd \"%ProgramFiles(x86)%\\Microsoft SDKs\\Azure\\Storage Emulator\" && StartStorageEmulator.cmd",
     "start-functions": "cd Taskorate.Functions && dotnet watch msbuild /t:RunFunctions",
     "start-blazor-node": "cd Taskorate.BlazorApp\\node-frontend && npm run dev",
-    "start-blazor-app": "cd Taskorate.BlazorApp && dotnet watch start"
+    "start-blazor-app": "cd Taskorate.BlazorApp && dotnet watch run"
   },
   "repository": {
     "type": "git",
