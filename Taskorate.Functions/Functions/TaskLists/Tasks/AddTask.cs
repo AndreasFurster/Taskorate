@@ -40,14 +40,13 @@ namespace Taskorate.Functions.Functions.TaskLists.Tasks
 
       log.LogInformation($"New task ({task.Name}) created by connection: {invocationContext.ConnectionId}");
 
-      // Send new task to everyone in group
+      // Send new task to everyone else in the group
       await signalRMessages.AddAsync(new SignalRMessage
       {
-        // UserId = invocationContext.ConnectionId,
-
         GroupName = taskListId,
         Target = GotNewTaskMessage.MethodName,
-        Arguments = new object[] { new GotNewTaskMessage(task) }
+        Arguments = new object[] { new GotNewTaskMessage(task) },
+        Except = new[] { invocationContext.ConnectionId }
       });
 
       // Get entire task list
